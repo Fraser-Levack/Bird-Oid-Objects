@@ -11,30 +11,40 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 public class StartApplication extends Application {
 
-    private BirdObject bird;
+    private List<BirdObject> birds;
+
     private Canvas canvas;
     @Override
     public void start(Stage primaryStage) {
         // Initialize your UI components and set up the scene here
-        primaryStage.setTitle("Simple JavaFX Game");
+        primaryStage.setTitle("Boids");
 
         // Create a canvas
-        this.canvas = new Canvas(400, 300);
+        this.canvas = new Canvas(800, 600);
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
-        // Draw a bird object on the canvas
+        // Draw a birds objects on the canvas
 
-        this.bird = new BirdObject(200, 150, 20, Color.BLACK);
-        bird.draw(gc);
+        this.birds = new ArrayList<>();
+        Random random = new Random();
+        int numberOfBirds = 10;
+        for (int i = 0; i < numberOfBirds; i++) {
+            BirdObject bird = new BirdObject(random.nextInt(20,780), random.nextInt(20,580), 20, Color.WHITE);
+            birds.add(bird);
+        }
+
 
         // Create a layout pane and add the canvas to it
         StackPane root = new StackPane();
         root.getChildren().add(canvas);
 
         // Create a scene and set it on the stage
-        Scene scene = new Scene(root, 400, 300);
+        Scene scene = new Scene(root, 800, 600);
         primaryStage.setScene(scene);
 
         Timeline timeline = new Timeline(new KeyFrame(Duration.millis(16), e -> {
@@ -49,32 +59,32 @@ public class StartApplication extends Application {
     }
 
     private void update() {
-        double radius = bird.getRadius();
-        double nextX = bird.getCenterX() + bird.getVelocityX();
-        double nextY = bird.getCenterY() + bird.getVelocityY();
         double canvasWidth = canvas.getWidth();
         double canvasHeight = canvas.getHeight();
 
-        // Check if the next position exceeds the container boundaries
-        if (nextX - radius < 0 || nextX + radius > canvasWidth) {
-            // Reverse the horizontal velocity to bounce off the left or right wall
-            bird.setVelocityX(-bird.getVelocityX());
-        }
-        if (nextY - radius < 0 || nextY + radius > canvasHeight) {
-            // Reverse the vertical velocity to bounce off the top or bottom wall
-            bird.setVelocityY(-bird.getVelocityY());
-        }
+        for (BirdObject bird : birds) {
+            double radius = bird.getRadius();
+            double nextX = bird.getCenterX() + bird.getVelocityX();
+            double nextY = bird.getCenterY() + bird.getVelocityY();
 
-        // Update circle position
-        bird.setCenterX(nextX);
-        bird.setCenterY(nextY);
+            if (nextX - radius < 0 || nextX + radius > canvasWidth) {
+                bird.setVelocityX(-bird.getVelocityX());
+            }
+            if (nextY - radius < 0 || nextY + radius > canvasHeight) {
+                bird.setVelocityY(-bird.getVelocityY());
+            }
+
+            bird.setCenterX(nextX);
+            bird.setCenterY(nextY);
+        }
     }
-
     private void render(GraphicsContext gc) {
-        gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
+        gc.setFill(Color.BLACK);
+        gc.fillRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
 
-        // Draw the circle
-        bird.draw(gc);
+        for (BirdObject bird : birds) {
+            bird.draw(gc);
+        }
     }
 
     public static void main(String[] args) {

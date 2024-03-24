@@ -30,8 +30,8 @@ public class BirdObject {
                 0.0, 20.0
         );
 
-        birdShape.setFill(Color.BLACK);
-        birdShape.setStroke(Color.BLACK);
+        birdShape.setFill(color);
+        birdShape.setStroke(color);
         birdShape.setStrokeWidth(1.0);
         // Position the bird at the initial center position
         birdShape.setLayoutX(centerX);
