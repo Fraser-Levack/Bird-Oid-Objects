@@ -19,13 +19,14 @@ public class StartApplication extends Application {
     private List<BirdObject> birds;
 
     private Canvas canvas;
+    public int[] canvasSize = new int[]{1200, 700};
     @Override
     public void start(Stage primaryStage) {
         // Initialize your UI components and set up the scene here
         primaryStage.setTitle("Boids");
 
         // Create a canvas
-        this.canvas = new Canvas(800, 600);
+        this.canvas = new Canvas(canvasSize[0], canvasSize[1]);
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
         // Draw a birds objects on the canvas
@@ -44,7 +45,7 @@ public class StartApplication extends Application {
         root.getChildren().add(canvas);
 
         // Create a scene and set it on the stage
-        Scene scene = new Scene(root, 800, 600);
+        Scene scene = new Scene(root, canvasSize[0], canvasSize[1]);
         primaryStage.setScene(scene);
 
         Timeline timeline = new Timeline(new KeyFrame(Duration.millis(16), e -> {
