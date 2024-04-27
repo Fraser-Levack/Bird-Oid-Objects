@@ -32,7 +32,7 @@ public class StartApplication extends Application {
 
         this.birds = new ArrayList<>();
         Random random = new Random();
-        int numberOfBirds = 10;
+        int numberOfBirds = 20;
         for (int i = 0; i < numberOfBirds; i++) {
             BirdObject bird = new BirdObject(random.nextInt(20,780), random.nextInt(20,580), 20, Color.WHITE);
             birds.add(bird);
@@ -90,6 +90,9 @@ public class StartApplication extends Application {
                 setVelocityTowardsTarget(bird, averagePosition);
             }
 
+            // bird to change direction towards average trajectory angle of other birds
+            double averageAngle = getAverageAngle(nearbyBirds);
+            setVelocityTowardsAverageAngle(bird, averageAngle);
 
             bird.setCenterX(nextX);
             bird.setCenterY(nextY);
@@ -146,11 +149,30 @@ public class StartApplication extends Application {
         return new double[]{sumX / positions.size(), sumY / positions.size()};
     }
 
+    // get average angle of birds from a list of birds
+    private double getAverageAngle(List<BirdObject> birds) {
+        double sumX = 0;
+        double sumY = 0;
+        for (BirdObject bird : birds) {
+            sumX += bird.getVelocityX();
+            sumY += bird.getVelocityY();
+        }
+        return Math.atan2(sumY, sumX);
+    }
+
+    // setting birds velocity to slowly move towards the same direction as other birds
+    private void setVelocityTowardsAverageAngle(BirdObject bird, double averageAngle) {
+        double angle = Math.atan2(bird.getVelocityY(), bird.getVelocityX());
+        bird.setVelocityX(bird.getVelocityX() + Math.cos(averageAngle - angle) * 0.2);
+        bird.setVelocityY(bird.getVelocityY() + Math.sin(averageAngle - angle) * 0.2);
+    }
+
+
     // setting a birds velocity to increment towards a target position
     private void setVelocityTowardsTarget(BirdObject bird, double[] target) {
         double angle = Math.atan2(target[1] - bird.getCenterY(), target[0] - bird.getCenterX());
-        bird.setVelocityX(bird.getVelocityX() + Math.cos(angle) * 0.3);
-        bird.setVelocityY(bird.getVelocityY() + Math.sin(angle) * 0.3);
+        bird.setVelocityX(bird.getVelocityX() + Math.cos(angle) * 0.5);
+        bird.setVelocityY(bird.getVelocityY() + Math.sin(angle) * 0.5);
     }
 
     // setting a birds velocity to increment away from a target position
