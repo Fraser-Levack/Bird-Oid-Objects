@@ -20,7 +20,7 @@ public class BirdObject {
         this.centerY = centerY;
         this.radius = radius;
         this.color = color;
-        this.velocityX = 7;
+        this.velocityX = 4;
         this.velocityY = 3;
 
         birdShape = new Polygon();
@@ -76,6 +76,7 @@ public class BirdObject {
         gc.restore(); // Restore graphics context state
     }
 
+
     public double getCenterX() {
         return centerX;
     }
@@ -87,6 +88,7 @@ public class BirdObject {
     public double getCenterY() {
         return centerY;
     }
+
     public void setCenterY(double centerY) {
         this.centerY = centerY;
     }
@@ -104,10 +106,22 @@ public class BirdObject {
     }
 
     public void setVelocityX(double velocityX){
+        // ensure velocity is within a certain range
+        if (velocityX > 10) {
+            velocityX = 10;
+        } else if (velocityX < -10) {
+            velocityX = -10;
+        }
         this.velocityX = velocityX;
     }
 
     public void setVelocityY(double velocityY){
+        // ensure velocity is within a certain range
+        if (velocityY > 10) {
+            velocityY = 10;
+        } else if (velocityY < -10) {
+            velocityY = -10;
+        }
         this.velocityY = velocityY;
     }
 }

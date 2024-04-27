@@ -74,10 +74,94 @@ public class StartApplication extends Application {
                 bird.setVelocityY(-bird.getVelocityY());
             }
 
+            // bird to move away from other birds average position if they are too close
+            List<BirdObject> nearbyBirds = getNearbyBirds(bird);
+            if (!nearbyBirds.isEmpty()) {
+                List<double[]> positions = getPositions(nearbyBirds);
+                double[] averagePosition = getAveragePosition(positions);
+                setVelocityAwayFromTarget(bird, averagePosition);
+            }
+
+            // bird to move towards the average position of other far away birds
+            List<BirdObject> farBirds = getFarBirds(bird);
+            if (!farBirds.isEmpty()) {
+                List<double[]> positions = getPositions(farBirds);
+                double[] averagePosition = getAveragePosition(positions);
+                setVelocityTowardsTarget(bird, averagePosition);
+            }
+
+
             bird.setCenterX(nextX);
             bird.setCenterY(nextY);
         }
     }
+
+    // to get other birds in the canvas around a small radius
+    private List<BirdObject> getNearbyBirds(BirdObject bird) {
+        List<BirdObject> nearbyBirds = new ArrayList<>();
+        for (BirdObject otherBird : birds) {
+            if (bird != otherBird) {
+                double distance = Math.sqrt(Math.pow(bird.getCenterX() - otherBird.getCenterX(), 2) +
+                        Math.pow(bird.getCenterY() - otherBird.getCenterY(), 2));
+                if (distance < 100) {
+                    nearbyBirds.add(otherBird);
+                }
+            }
+        }
+        return nearbyBirds;
+    }
+
+    // to get other birds in the canvas around a large radius
+    private List<BirdObject> getFarBirds(BirdObject bird) {
+        List<BirdObject> farBirds = new ArrayList<>();
+        for (BirdObject otherBird : birds) {
+            if (bird != otherBird) {
+                double distance = Math.sqrt(Math.pow(bird.getCenterX() - otherBird.getCenterX(), 2) +
+                        Math.pow(bird.getCenterY() - otherBird.getCenterY(), 2));
+                if (distance < 300) {
+                    farBirds.add(otherBird);
+                }
+            }
+        }
+        return farBirds;
+    }
+
+    // returning list of positions of a list of birds
+    private List<double[]> getPositions(List<BirdObject> birds) {
+        List<double[]> positions = new ArrayList<>();
+        for (BirdObject bird : birds) {
+            positions.add(new double[]{bird.getCenterX(), bird.getCenterY()});
+        }
+        return positions;
+    }
+
+    // returning a calculation of the average position of a list of positions
+    private double[] getAveragePosition(List<double[]> positions) {
+        double sumX = 0;
+        double sumY = 0;
+        for (double[] position : positions) {
+            sumX += position[0];
+            sumY += position[1];
+        }
+        return new double[]{sumX / positions.size(), sumY / positions.size()};
+    }
+
+    // setting a birds velocity to increment towards a target position
+    private void setVelocityTowardsTarget(BirdObject bird, double[] target) {
+        double angle = Math.atan2(target[1] - bird.getCenterY(), target[0] - bird.getCenterX());
+        bird.setVelocityX(bird.getVelocityX() + Math.cos(angle) * 0.3);
+        bird.setVelocityY(bird.getVelocityY() + Math.sin(angle) * 0.3);
+    }
+
+    // setting a birds velocity to increment away from a target position
+    private void setVelocityAwayFromTarget(BirdObject bird, double[] target) {
+        double angle = Math.atan2(target[1] - bird.getCenterY(), target[0] - bird.getCenterX());
+        bird.setVelocityX(bird.getVelocityX() - Math.cos(angle) * 0.3);
+        bird.setVelocityY(bird.getVelocityY() - Math.sin(angle) * 0.3);
+    }
+
+
+
     private void render(GraphicsContext gc) {
         gc.setFill(Color.BLACK);
         gc.fillRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
